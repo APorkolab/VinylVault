@@ -1,5 +1,4 @@
 <?php
-
 class RefreshTokenModel
 {
     private $conn;
@@ -11,16 +10,24 @@ class RefreshTokenModel
         $this->key = $key;
     }
 
-    public function create(string $token, int $expiry): bool
+    public function create(string $token, int $expiry, int $user_id): bool
     {
+        $check_user_id = "SELECT * FROM user WHERE id = :user_id";
+        $stmt = $this->conn->prepare($check_user_id);
+        $stmt->bindValue(':user_id', $user_id);
+        $stmt->execute();
+        if ($stmt->rowCount() == 0) {
+            return false;
+        }
         $hash = hash_hmac("sha256", $token, $this->key);
 
-        $sql = "INSERT INTO refresh_token (token_hash, expires_at)
-                VALUES (:token_hash, :expires_at)";
+        $sql = "INSERT INTO refresh_token (token_hash, expires_at, user_id)
+                VALUES (:token_hash, :expires_at, :user_id)";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(":token_hash", $hash);
         $stmt->bindValue(":expires_at", $expiry);
+        $stmt->bindValue(":user_id", $user_id);
 
         return $stmt->execute();
     }
@@ -46,7 +53,8 @@ class RefreshTokenModel
 
         $sql = "SELECT *
                 FROM refresh_token
-                WHERE token_hash = :token_hash";
+                JOIN user ON refresh_token.user_id = user.id
+                WHERE refresh_token.token_hash = :token_hash";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(":token_hash", $hash);

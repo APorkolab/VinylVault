@@ -21,4 +21,9 @@ class UserModel
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+  public function getData(): array
+{
+return $this->getByIdentifier();
+}
 }

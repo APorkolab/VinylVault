@@ -1,4 +1,5 @@
 <?php
+use Dotenv\Exception\ValidationException;
 
 class ProductModel
 {
@@ -13,59 +14,66 @@ class ProductModel
     {
         $sql = "SELECT *
                 FROM products
-                WHERE user_id = :user_id
                 ORDER BY name";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
+
         $stmt->execute();
 
         $data = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $row['is_avaible'] = (bool) $row['is_avaible'];
             $data[] = $row;
         }
 
         return $data;
     }
-
     public function getForUser(int $user_id, string $id): array |false
     {
         $sql = "SELECT *
                 FROM products
-                WHERE id = :id
-                AND user_id = :user_id";
+                WHERE id = :id";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(":id", $id, PDO::PARAM_STR);
         $stmt->execute();
 
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($data !== false) {
-            $data['is_avaible'] = (bool) $data['is_avaible'];
-        }
 
         return $data;
     }
 
+
     public function createForUser(int $user_id, array $data): string
     {
-        $sql = "INSERT INTO products (name, description, price, is_avaible, created_at)
-VALUES (:name, :description, :price, :is_avaible, CURRENT_TIMESTAMP)";
+        $errors = [];
+        $error_string = implode(',', $errors);
+        if (empty($data['name'])) {
+            $errors['name'] = 'Name is required';
+        }
+        if (empty($data['price']) || !is_numeric($data['price'])) {
+            $errors['price'] = 'Price is required and must be a number';
+        }
+        if (!empty($errors)) {
+            throw new ValidationException($error_string);
+        }
+
+
+        $sql = "INSERT INTO products (name, description, price, is_avaible, created_at, user_id)
+VALUES (:name, :description, :price, :is_avaible, CURRENT_TIMESTAMP, :user_id)";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);
         $stmt->bindValue(":description", $data["description"] ?? null, PDO::PARAM_STR);
-        $stmt->bindValue(":price", $data["price"] ?? null, PDO::PARAM_INT);
+        $stmt->bindValue(":price", $data["price"], PDO::PARAM_INT);
         $stmt->bindValue(":is_avaible", $data["is_avaible"] ?? false, PDO::PARAM_BOOL);
-
+        $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
         $stmt->execute();
 
         return $this->conn->lastInsertId();
     }
+
 
     public function updateForUser(int $user_id, string $id, array $data): int
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . "/bootstrap.php";
+require __DIR__ . "/api/bootstrap.php";
 
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $parts = explode("/", $path);
