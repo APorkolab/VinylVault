@@ -1,31 +1,35 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import HelloWorld from './components/HelloWorld.vue'
 import ProductList from './components/ProductList.vue'
 import ProductEdit from './components/ProductEdit.vue'
+import Login from './components/Login.vue'
 import Auth from './components/Auth.vue'
 
 
-
-const routes = [
-	{
-		path: '/',
-		name: 'ProductList',
-		component: ProductList
-	},
-	{
-		path: '/edit/:id',
-		name: 'ProductEdit',
-		component: ProductEdit
-	},
-	{
-		path: '/auth',
-		name: 'Auth',
-		component: Auth
-	}
-]
-
-const router = new VueRouter({
-	routes
+export default createRouter({
+	history: createWebHistory(),
+	routes: [
+		{
+			path: '/',
+			component: HelloWorld,
+		},
+		{
+			path: '/products',
+			name: 'ProductList',
+			component: ProductList
+		},
+		{
+			path: '/products/:id',
+			name: 'edit',
+			component: ProductEdit,
+			props: true
+		},
+		{
+			path: '/login',
+			name: 'Login',
+			component: Login
+		}
+	]
 })
-
-export { router }

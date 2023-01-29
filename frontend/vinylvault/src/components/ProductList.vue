@@ -1,91 +1,101 @@
 <template>
   <div>
-    <Auth ref="auth" />
-  </div>
-  <div class="container">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.id }}</td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.description }}</td>
-          <td>{{ product.price }}</td>
-          <td>
-            <router-link
-              :to="{ name: 'edit', params: { id: product.id } }"
-              class="btn btn-primary"
-              >Edit</router-link
-            >
-            <button class="btn btn-danger" @click="deleteProduct(product.id)">
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="!isToken || products.length === 0">
+      <Login ref="auth" />
+    </div>
+    <div v-else class="container">
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Price</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="item" v-for="item in products" :key="item.id">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.price }}</td>
+            <td>
+              <router-link :to="{ name: 'edit', params: { id: item.id } }"
+                >Edit</router-link
+              >
+              <button class="btn btn-danger" @click="deleteProduct(item.id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { mapState } from 'vuex';
-import { State } from './store';
-
-import Vue from 'vue';
-import Vuex from 'vuex';
-Vue.use(Vuex);
+import Auth from './Auth.vue';
+import { Product } from './../models/product';
+import axios from 'axios';
+import * as localForage from 'localforage';
+import Login from './Login.vue';
 
 export default {
   name: 'ProductList',
-  computed: {
-    ...mapState<State>({
-      products: (state) => state.products,
-    }),
+  data() {
+    return {
+      products: [] as Product[],
+    };
   },
-  mounted() {
-    this.fetchProducts();
+  async created() {
+    try {
+      let result = await axios.get('http://localhost/vinylvault/products', {
+        headers: {
+          Authorization:
+            'Bearer ' +
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMsIm5hbWUiOiJib2xkb2ciLCJleHAiOjE2NzUwMjc5NDd9.De0BHFAquONXjUe5F2y0VxfA3ZkV17wlSHgxf4Nr2-s',
+          'HTTP-STATUS': '200',
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers':
+            'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+        },
+      });
+      this.products = result.data;
+    } catch (error) {
+      console.error(error);
+    }
   },
   methods: {
-    async fetchProducts() {
+    async deleteProduct(id: number) {
       try {
-        const response = await fetch('http://localhost/vinylvault/products', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer ' + this.$refs.auth.getToken(),
-          },
-        });
-        const data = await response.json();
-        this.$store.commit('setProducts', data);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async deleteProduct(id) {
-      try {
-        const response = await fetch(
+        let result = await axios.delete(
           `http://localhost/vinylvault/products/${id}`,
           {
-            method: 'DELETE',
             headers: {
-              Authorization: `Bearer ${this.$store.state.token}`,
+              Authorization: 'Bearer ' + localForage.getItem('token'),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
             },
           }
         );
-        if (response.ok) {
-          this.$store.commit('deleteProduct', id);
-        }
+        console.log(result.data);
+        this.products = this.products.filter((product) => product.id !== id);
       } catch (error) {
         console.error(error);
       }
     },
+    async isToken() {
+      return (await localForage.getItem('token')) === null || undefined
+        ? false
+        : true;
+    },
   },
+  components: { Login },
 };
 </script>

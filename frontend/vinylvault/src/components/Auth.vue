@@ -6,6 +6,8 @@
 </template>
 
 <script lang="ts">
+import * as localForage from 'localforage';
+
 export default {
   data() {
     return {
