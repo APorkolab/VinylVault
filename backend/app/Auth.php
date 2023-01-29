@@ -9,7 +9,7 @@ class Auth
 
     public function __construct(userModel $userModel, JWTEncoder $codec)
     {
-	$this->userModel = $userModel;
+        $this->userModel = $userModel;
         $this->codec = $codec;
     }
 
@@ -24,7 +24,7 @@ class Auth
 
         $api_key = $_SERVER["HTTP_X_API_KEY"];
 
-	$user = $this->userModel->getByIdentifier($api_key, 'api_key') ?: false;
+        $user = $this->userModel->getByIdentifier($api_key, 'api_key') ?: false;
 
         if ($user === false) {
 

@@ -59,7 +59,7 @@ if ($user === false) {
 
 require __DIR__ . "/tokens.php";
 
-$refresh_token_gateway->delete($data["token"]);
-$refresh_token_gateway->create($user_id, $refresh_token_expiry);
+$refreshTokenModel->delete($data["token"]);
+$refreshTokenModel->create($user_id, $data["token"], $refresh_token_expiry);
 
 ?>

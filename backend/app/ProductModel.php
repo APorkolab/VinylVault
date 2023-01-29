@@ -13,8 +13,8 @@ class ProductModel
     public function getAllForUser(int $user_id): array
     {
         $sql = "SELECT *
-                FROM products
-                ORDER BY name";
+            FROM products
+            ORDER BY name";
 
         $stmt = $this->conn->prepare($sql);
 
@@ -43,7 +43,6 @@ class ProductModel
 
         return $data;
     }
-
 
     public function createForUser(int $user_id, array $data): string
     {

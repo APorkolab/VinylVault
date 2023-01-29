@@ -1,6 +1,11 @@
 <?php
-
 declare(strict_types=1);
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    header('Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, HTTP-STATUS, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Content-Type, Access-Control-Allow-Origin');
+    header("Access-Control-Allow-Origin: *");
+    header('HTTP/1.1 200 OK');
+    die();
+}
 
 require __DIR__ . "/api/bootstrap.php";
 
@@ -17,6 +22,7 @@ $database = new Database(
 
 $codec = new JWTEncoder($_ENV["SECRET_KEY"]);
 $auth = new Auth(new UserModel($database), $codec);
+
 
 if (!$auth->authenticateAccessToken()) {
     exit;

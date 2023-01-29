@@ -5,7 +5,7 @@ declare(strict_types=1);
 $accessPayload = [
     'sub' => $user["id"],
     'name' => $user["name"],
-    'exp' => time() + 300
+    'exp' => time() + 3600 // expires in 1 hour
 ];
 
 $accessToken = $codec->encode($accessPayload);

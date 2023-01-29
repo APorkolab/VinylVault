@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 require __DIR__ . "/bootstrap.php";
 
+
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
     http_response_code(405);
+    header('HTTP/1.1 200 OK');
     header("Allow: POST");
     exit;
 }
 
+// if ($_SERVER["REQUEST_METHOD"] === "OPTIONS" || $_SERVER["REQUEST_METHOD"] === "POST" ) {
+//     header("Access-Control-Allow-Origin: *");
+//     header('Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, 
+//     Authorization, HTTP-STATUS, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Allow-Credentials, Access-Control-Max-Age, Access-Control-Expose-Headers');
+//     header('HTTP/1.1 200 OK');
+//     die();
+// }
 // $data = (array) json_decode(file_get_contents("php://input"), true);
 // $data = json_decode(file_get_contents("php://input"), true);
 $data = (array) json_decode(file_get_contents("php://input"), true);
@@ -62,16 +71,16 @@ require __DIR__ . "/tokens.php";
 $access_token = $codec->encode(["sub" => $user["id"], "name" => $user["username"], "exp" => $access_token_expiry]);
 $refresh_token = $codec->encode(["sub" => $user["id"], "exp" => $refresh_token_expiry]);
 
-$refresh_token_gateway = new RefreshTokenModel($database, $_ENV["SECRET_KEY"]);
+$refreshTokenModel = new RefreshTokenModel($database, $_ENV["SECRET_KEY"]);
 
-$refresh_token_gateway->create($refresh_token, $refresh_token_expiry, $access_token_expiry, $user["id"]);
+$refreshTokenModel->create($refresh_token, $refresh_token_expiry, $user["id"]);
 
 
-echo json_encode([
-    "access_token" => $access_token,
-    "refresh_token" => $refresh_token
+// echo json_encode([
+//     "access_token" => $access_token,
+//     "refresh_token" => $refresh_token
 
-]);
+// ]);
 
 exit;
 
