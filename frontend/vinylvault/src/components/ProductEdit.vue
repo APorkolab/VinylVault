@@ -42,7 +42,7 @@
 </template>
 <script lang="ts">
 import * as localForage from 'localforage';
-import Auth from './Auth.vue';
+import axios from 'axios';
 
 export default {
   data() {
@@ -55,31 +55,53 @@ export default {
     };
   },
   created() {
-    this.fetchProduct();
+    this.getProduct();
   },
   methods: {
-    async fetchProduct() {
-      const response = await fetch('/api/products/' + this.$route.params.id, {
-        headers: {
-          Authorization: 'Bearer ' + localForage.getItem('token'),
-        },
-      });
-      const product = await response.json();
-      this.product = product;
-    },
-    async saveProduct() {
-      const response = await fetch('/api/products/' + this.$route.params.id, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + localForage.getItem('token'),
-        },
-        body: JSON.stringify(this.product),
-      });
-      if (response.ok) {
-        this.$router.push({ name: 'product-list' });
+    async getProduct() {
+      try {
+        const productResponse = await axios.get(
+          'http://localhost/vinylvault/products/' + this.$route.params.id,
+          {
+            headers: {
+              Authorization: 'Bearer ' + localForage.getItem('token'),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+            },
+          }
+        );
+        this.product = productResponse.data;
+      } catch (error) {
+        console.error(error);
       }
     },
+    async saveProduct() {
+      try {
+        const productResponse = await axios.put(
+          'http://localhost/vinylvault/products/' + this.$route.params.id,
+          this.product,
+          {
+            headers: {
+              Authorization: 'Bearer ' + localForage.getItem('token'),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+            },
+          }
+        );
+        if (productResponse.status === 200) {
+          this.$router.push({ name: 'product-list' });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async isToken() {
       return (await localForage.getItem('token')) === null || undefined
         ? false

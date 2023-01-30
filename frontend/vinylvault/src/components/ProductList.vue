@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isToken || products.length === 0">
+    <div v-if="!isToken">
       <Login ref="auth" />
     </div>
     <div v-else class="container">
@@ -21,9 +21,9 @@
             <td>{{ item.description }}</td>
             <td>{{ item.price }}</td>
             <td>
-              <router-link :to="{ name: 'edit', params: { id: item.id } }"
-                >Edit</router-link
-              >
+              <router-link :to="{ name: 'edit', params: { id: item.id } }">
+                Edit
+              </router-link>
               <button class="btn btn-danger" @click="deleteProduct(item.id)">
                 Delete
               </button>
@@ -49,26 +49,38 @@ export default {
       products: [] as Product[],
     };
   },
-  async created() {
-    try {
-      let result = await axios.get('http://localhost/vinylvault/products', {
-        headers: {
-          Authorization:
-            'Bearer ' +
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMsIm5hbWUiOiJib2xkb2ciLCJleHAiOjE2NzUwMjc5NDd9.De0BHFAquONXjUe5F2y0VxfA3ZkV17wlSHgxf4Nr2-s',
-          'HTTP-STATUS': '200',
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers':
-            'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-        },
-      });
-      this.products = result.data;
-    } catch (error) {
-      console.error(error);
-    }
+  mounted() {
+    this.getProducts();
   },
+
   methods: {
+    async getProducts() {
+      try {
+        let allProduct = await axios.get(
+          'http://localhost/vinylvault/products',
+          {
+            headers: {
+              Authorization: 'Bearer ' + localForage.getItem('token'),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+            },
+          }
+        );
+        if (allProduct.status === 400) {
+          const data = allProduct.data;
+          localForage.removeItem('token');
+          console.log('Please login!');
+          this.$router.push('/login');
+        } else {
+          this.products = allProduct.data;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async deleteProduct(id: number) {
       try {
         let result = await axios.delete(
@@ -84,8 +96,43 @@ export default {
             },
           }
         );
-        console.log(result.data);
-        this.products = this.products.filter((product) => product.id !== id);
+        if (result.status === 400) {
+          const data = result.data;
+          localForage.removeItem('token');
+          console.log('Please login!');
+          this.$router.push('/login');
+        } else {
+          console.log(result.data);
+          this.products = this.products.filter((product) => product.id !== id);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async createProduct(product: Product) {
+      try {
+        let response = await axios.post(
+          'http://localhost/vinylvault/products',
+          product,
+          {
+            headers: {
+              Authorization: 'Bearer ' + 'tarara',
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+            },
+          }
+        );
+        if (response.status === 400) {
+          localForage.removeItem('token');
+          console.log('Please login!');
+          this.$router.push('/login');
+        } else {
+          console.log('Product created successfully!');
+          this.$router.push('/products');
+        }
       } catch (error) {
         console.error(error);
       }

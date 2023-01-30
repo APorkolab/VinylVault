@@ -43,24 +43,21 @@ export default {
       try {
         const response = await axios.post(
           'http://localhost/vinylvault/api/login.php',
-          {
+          JSON.stringify({
             username: this.username,
             password: this.password,
-          },
+          }),
           {
             headers: {
-              'Access-Control-Allow-Headers':
-                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-              'Content-Type':
-                'application/x-www-form-urlencoded; charset=UTF-8',
-              'Access-Control-Allow-Origin': '*',
+              'Content-Type': 'application/json',
             },
           }
         );
+
         if (response.status === 200) {
           const data = response.data;
           localForage.setItem('token', data.access_token);
-          this.$router.push('/home');
+          this.$router.push('/products');
         } else {
           console.log('Invalid username or password');
         }
