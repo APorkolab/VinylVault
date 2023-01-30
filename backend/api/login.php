@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 require __DIR__ . "/bootstrap.php";
-
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
