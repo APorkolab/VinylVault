@@ -1,5 +1,5 @@
 <!-- <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+Vue.use(VueRouter);
 </script> -->
 
 <template>

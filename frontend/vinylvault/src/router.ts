@@ -4,8 +4,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import ProductList from './components/ProductList.vue'
 import ProductEdit from './components/ProductEdit.vue'
+import Register from './components/Register.vue'
 import Login from './components/Login.vue'
-import Auth from './components/Auth.vue'
+import Auth from './components/Register.vue'
+
 
 
 export default createRouter({
@@ -30,6 +32,11 @@ export default createRouter({
 			path: '/login',
 			name: 'Login',
 			component: Login
+		},
+		{
+			path: '/register',
+			name: 'Register',
+			component: Register
 		}
 	]
 })

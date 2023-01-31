@@ -36,11 +36,12 @@
 </template>
 
 <script lang="ts">
-import Auth from './Auth.vue';
+import Auth from './Register.vue';
 import { Product } from './../models/product';
 import axios from 'axios';
 import * as localForage from 'localforage';
 import Login from './Login.vue';
+import router from '../router';
 
 export default {
   name: 'ProductList',
@@ -55,12 +56,17 @@ export default {
 
   methods: {
     async getProducts() {
+      console.log(localForage.getItem('access_token'));
       try {
         let allProduct = await axios.get(
           'http://localhost/vinylvault/products',
           {
             headers: {
-              Authorization: 'Bearer ' + localForage.getItem('token'),
+              Authorization:
+                'Bearer ' +
+                (await localForage.getItem('access_token').then((value) => {
+                  return value;
+                })),
               'HTTP-STATUS': '200',
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
@@ -69,13 +75,12 @@ export default {
             },
           }
         );
-        if (allProduct.status === 400) {
-          const data = allProduct.data;
-          localForage.removeItem('token');
+        if (allProduct.status === 200) {
+          this.products = allProduct.data;
+        } else {
+          localForage.removeItem('access_token');
           console.log('Please login!');
           this.$router.push('/login');
-        } else {
-          this.products = allProduct.data;
         }
       } catch (error) {
         console.error(error);
@@ -87,7 +92,8 @@ export default {
           `http://localhost/vinylvault/products/${id}`,
           {
             headers: {
-              Authorization: 'Bearer ' + localForage.getItem('token'),
+              Authorization:
+                'Bearer ' + (await localForage.getItem('access_token')),
               'HTTP-STATUS': '200',
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
@@ -98,7 +104,7 @@ export default {
         );
         if (result.status === 400) {
           const data = result.data;
-          localForage.removeItem('token');
+          await localForage.removeItem('access_token');
           console.log('Please login!');
           this.$router.push('/login');
         } else {
@@ -116,7 +122,8 @@ export default {
           product,
           {
             headers: {
-              Authorization: 'Bearer ' + 'tarara',
+              Authorization:
+                'Bearer ' + (await localForage.getItem('access_token')),
               'HTTP-STATUS': '200',
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
@@ -126,7 +133,7 @@ export default {
           }
         );
         if (response.status === 400) {
-          localForage.removeItem('token');
+          await localForage.removeItem('access_token');
           console.log('Please login!');
           this.$router.push('/login');
         } else {
@@ -138,7 +145,7 @@ export default {
       }
     },
     async isToken() {
-      return (await localForage.getItem('token')) === null || undefined
+      return (await localForage.getItem('access_token')) === null || undefined
         ? false
         : true;
     },

@@ -30,7 +30,6 @@
 <script lang="ts">
 import axios from 'axios';
 import * as localForage from 'localforage';
-
 export default {
   data() {
     return {
@@ -43,10 +42,10 @@ export default {
       try {
         const response = await axios.post(
           'http://localhost/vinylvault/api/login.php',
-          JSON.stringify({
+          {
             username: this.username,
             password: this.password,
-          }),
+          },
           {
             headers: {
               'Content-Type': 'application/json',
@@ -54,14 +53,21 @@ export default {
           }
         );
 
-        if (response.status === 200) {
-          const data = response.data;
-          localForage.setItem('token', data.access_token);
+        const data = response.data;
+        await localForage.setItem('access_token', data.access_token);
+        if ((await localForage.getItem('access_token')) !== null) {
+          console.log(await localForage.getItem('access_token'));
           this.$router.push('/products');
         } else {
+          console.log(
+            'access_token: ' + (await localForage.getItem('access_token'))
+          );
           console.log('Invalid username or password');
         }
       } catch (error) {
+        console.log(
+          'access_token: ' + (await localForage.getItem('access_token'))
+        );
         console.error(error);
       }
     },

@@ -85,7 +85,7 @@ export default {
           this.product,
           {
             headers: {
-              Authorization: 'Bearer ' + localForage.getItem('token'),
+              Authorization: 'Bearer ' + (await localForage.getItem('token')),
               'HTTP-STATUS': '200',
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
