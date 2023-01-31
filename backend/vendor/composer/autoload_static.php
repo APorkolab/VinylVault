@@ -8,6 +8,7 @@ class ComposerStaticInit00a99a8c38cc7e522160b67e4d9f7f00
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
     );
@@ -18,10 +19,18 @@ class ComposerStaticInit00a99a8c38cc7e522160b67e4d9f7f00
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\Finder\\' => 25,
         ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
+            'Psr\\Cache\\' => 10,
             'PhpOption\\' => 10,
+        ),
+        'O' => 
+        array (
+            'OpenApi\\' => 8,
         ),
         'G' => 
         array (
@@ -30,6 +39,8 @@ class ComposerStaticInit00a99a8c38cc7e522160b67e4d9f7f00
         'D' => 
         array (
             'Dotenv\\' => 7,
+            'Doctrine\\Common\\Lexer\\' => 22,
+            'Doctrine\\Common\\Annotations\\' => 28,
         ),
     );
 
@@ -46,9 +57,29 @@ class ComposerStaticInit00a99a8c38cc7e522160b67e4d9f7f00
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Symfony\\Component\\Yaml\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\Finder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/src',
+        ),
+        'Psr\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
+        ),
+        'OpenApi\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
         ),
         'GrahamCampbell\\ResultType\\' => 
         array (
@@ -57,6 +88,14 @@ class ComposerStaticInit00a99a8c38cc7e522160b67e4d9f7f00
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
+        ),
+        'Doctrine\\Common\\Lexer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/lexer/src',
+        ),
+        'Doctrine\\Common\\Annotations\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
         ),
     );
 

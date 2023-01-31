@@ -2,8 +2,8 @@
 declare(strict_types=1);
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS" && $_SERVER["HTTP_ACCESS_CONTROL_REQUEST_METHOD"] === "POST" || $_SERVER["REQUEST_URI"] === '/api/login.php' || $_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Credentials: include");
-    header('Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization, HTTP-STATUS, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Content-Type, Access-Control-Allow-Origin');
+    header('Access-Control-Allow-Headers: *');
+    // header("Access-Control-Allow-Credentials: include");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header('HTTP/1.1 200 OK');
     die();

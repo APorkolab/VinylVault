@@ -1,0 +1,191 @@
+openapi: 3.0.0
+info:
+  title: VinylVault
+  version: 1.0.0
+servers:
+  - url: http://localhost
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - bearerAuth: []
+paths:
+  /vinylvault/products:
+    get:
+      tags:
+        - All API endpoints JWT protected except login and register
+      summary: Get all products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+    post:
+      tags:
+        - All API endpoints JWT protected except login and register
+      summary: Create a product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Example Product
+                description: This is an example product.
+                price: 19.99
+                is_avaible: 0
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+  /vinylvault/products/{id}:
+    get:
+      tags:
+        - All API endpoints JWT protected except login and register
+      summary: Get a product by ID
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The product ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+    patch:
+      tags:
+        - All API endpoints JWT protected except login and register
+      summary: Update a product by ID
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The product ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Product name updated
+                price: 22.5
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - All API endpoints JWT protected except login and register
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The product ID
+      summary: Delete a product by ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+  /vinylvault/login.php:
+    post:
+      tags:
+        - No JWT protection
+      summary: User login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: bela
+                password:
+                  type: string
+                  example: secret
+
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
+  /vinylvault/register.php:
+    post:
+      tags:
+        - No JWT protection
+      summary: User registration
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: bela
+                password:
+                  type: string
+                  example: secret
+                name:
+                  type: string
+                  example: Bela Talbot
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+        '400':
+          description: Bad request
+          content:
+            application/json: {}
