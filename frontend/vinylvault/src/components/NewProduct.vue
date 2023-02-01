@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isToken">
+    <div await v-if="!isTokenLoaded">
       <Login ref="auth" />
     </div>
     <div v-else class="container">
@@ -43,64 +43,47 @@
             v-model="product.is_avaible"
           />
         </div>
-        <button class="btn btn-primary" @click="newProduct()">Save</button>
+
+        <button
+          class="btn btn-primary"
+          @click="
+            newProduct();
+            showModal();
+          "
+        >
+          Save
+        </button>
         <a href="/products" class="btn btn-warning" role="button">Cancel</a>
       </form>
       <!-- Bootstrap modal -->
-      <div
-        class="modal fade"
-        id="productModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="productModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="productModalLabel">
-                {{ modalTitle }}
-              </h5>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              {{ modalMessage }}
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+      <!-- Button trigger modal -->
+      <div>
+        <b-button v-b-modal.modal-1>Launch demo modal</b-button>
+        <b-button @click="showModal()">eee demo modal</b-button>
+
+        <b-modal id="modal-1" title="BootstrapVue">
+          <p class="my-4">{{ modalMessage }}</p>
+        </b-modal>
       </div>
     </div>
+    <div></div>
   </div>
 </template>
 <script lang="ts">
 import * as localForage from 'localforage';
 import axios from 'axios';
 import { Product } from '../models/product';
+import { BIcon, BIconCamera } from 'bootstrap-vue';
 
 export default {
   name: 'NewProduct',
   data() {
     return {
       product: new Product(),
-      isToken: false,
+      isTokenLoaded: false,
       modalTitle: '',
       modalMessage: '',
+      modalShow: false,
     };
   },
   methods: {
@@ -110,35 +93,52 @@ export default {
           name: this.product.name,
           description: this.product.description,
           price: this.product.price,
-          is_avaible: this.product.is_avaible,
+          is_avaible: this.product.is_avaible ? 1 : 0,
         };
 
         const token = await localForage.getItem('access_token');
 
         const config = {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization:
+              'Bearer ' +
+              (await localForage.getItem('access_token').then((value) => {
+                return value;
+              })),
             'Content-Type': 'application/json',
           },
         };
 
-        await axios.post('http://localhost/vinylvault/products', data, config);
-        this.modalTitle = 'Success';
-        this.modalMessage = 'Product created successfully';
+        const response = await axios.post(
+          'http://localhost/vinylvault/products',
+          data,
+          config
+        );
+
+        if (response.status === 201) {
+          this.modalTitle = 'Success';
+          this.modalMessage = 'Product created successfully';
+          this.showModal();
+        } else {
+          this.modalTitle = 'Error';
+          this.modalMessage = 'Error creating product';
+          this.showModal();
+        }
       } catch (error) {
         this.modalTitle = 'Error';
         this.modalMessage = 'Error creating product';
-
         console.error(error);
       }
-      this.$router.push({ name: 'products' });
+      // this.$router.push('/products');
+    },
+    async showModal() {
+      this.$root!.$emit('bv::show::modal', 'modal-1');
     },
   },
   computed: {
-    async isToken() {
-      const token = await localForage.getItem('access_token');
-      const isToken = Boolean(token);
-      return isToken;
+    async isTokenLoaded(): Promise<boolean> {
+      const token = await localForage.getItem(this.modalMessage);
+      return Boolean(token);
     },
   },
 };

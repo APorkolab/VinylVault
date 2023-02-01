@@ -1,9 +1,8 @@
-// --- // TODO: // - tesztelni a POST, PUT, metódusokat // - beszúrni a logót,
-designolni. // - tesztelni a registert // - tesztelni a logoutot és megírni //
----
+// --- // TODO: // - tesztelni a POST, PUT, metódusokat tesztelni a logoutot és
+megírni // ---
 <template>
   <div>
-    <div v-if="!isToken">
+    <div await v-if="!isToken">
       <Login ref="auth" />
     </div>
     <div v-else class="container">
@@ -79,7 +78,16 @@ export default {
           'http://localhost/vinylvault/products/' + this.$route.params.id,
           {
             headers: {
-              Authorization: 'Bearer ' + token,
+              Authorization:
+                'Bearer ' +
+                (await localForage.getItem('access_token').then((value) => {
+                  return value;
+                })),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers':
+                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
             },
           }
         );

@@ -3,10 +3,18 @@
     <div v-if="!isToken">
       <Login ref="auth" />
     </div>
+
     <div v-else class="container">
       <router-link :to="{ name: 'newProduct', params: {} }">
         <button class="btn btn-primary">New product</button>
       </router-link>
+      <div>
+        <b-button v-b-modal.modal-1>Launch demo modal</b-button>
+
+        <b-modal id="modal-1" title="BootstrapVue">
+          <p class="my-4">Hello from modal!</p>
+        </b-modal>
+      </div>
       <table class="table table-striped table-dark">
         <thead>
           <tr>
