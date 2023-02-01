@@ -1,6 +1,3 @@
-// --- // TODO: // - tesztelni a POST, PUT, metódusokat // - beszúrni a logót,
-designolni. // - tesztelni a registert // - tesztelni a logoutot és megírni //
----
 <template>
   <div>
     <div v-if="!isToken">
@@ -46,81 +43,96 @@ designolni. // - tesztelni a registert // - tesztelni a logoutot és megírni //
             v-model="product.is_avaible"
           />
         </div>
-        <button class="btn btn-primary" @click="saveProduct(product.id)">
-          Save
-        </button>
+        <button class="btn btn-primary" @click="newProduct()">Save</button>
         <a href="/products" class="btn btn-warning" role="button">Cancel</a>
       </form>
+      <!-- Bootstrap modal -->
+      <div
+        class="modal fade"
+        id="productModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="productModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="productModalLabel">
+                {{ modalTitle }}
+              </h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {{ modalMessage }}
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts">
 import * as localForage from 'localforage';
 import axios from 'axios';
-import { identifier } from '@babel/types';
-import { Product } from './../models/product';
+import { Product } from '../models/product';
+
 export default {
+  name: 'NewProduct',
   data() {
     return {
-      product: {} as Product,
+      product: new Product(),
       isToken: false,
+      modalTitle: '',
+      modalMessage: '',
     };
   },
-  created() {
-    if (this.$route.params.id != '0') {
-      this.getProduct();
-    }
-  },
   methods: {
-    async getProduct() {
+    async newProduct() {
       try {
-        const token = await localForage.getItem('access_token');
-        const productResponse = await axios.get(
-          'http://localhost/vinylvault/products/' + this.$route.params.id,
-          {
-            headers: {
-              Authorization: 'Bearer ' + token,
-            },
-          }
-        );
-        this.product = productResponse.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
+        const data = {
+          name: this.product.name,
+          description: this.product.description,
+          price: this.product.price,
+          is_avaible: this.product.is_avaible,
+        };
 
-    async saveProduct(productId: number) {
-      try {
-        let url = 'http://localhost/vinylvault/products/' + productId;
-        const productData = JSON.stringify(this.product);
-        const productResponse = await axios.put(url, productData, {
+        const token = await localForage.getItem('access_token');
+
+        const config = {
           headers: {
-            Authorization:
-              'Bearer ' + (await localForage.getItem('access_token')),
-            'HTTP-STATUS': '200',
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-        });
-        // if (productResponse.status === 200 || productResponse.status === 201) {
-        // }
+        };
+
+        await axios.post('http://localhost/vinylvault/products', data, config);
+        this.modalTitle = 'Success';
+        this.modalMessage = 'Product created successfully';
       } catch (error) {
+        this.modalTitle = 'Error';
+        this.modalMessage = 'Error creating product';
+
         console.error(error);
       }
       this.$router.push({ name: 'products' });
     },
-  },
-  async goToProductPage() {
-    try {
-      await axios.get('http://localhost/vinylvault/products/', {
-        headers: {
-          Authorization:
-            'Bearer ' + (await localForage.getItem('access_token')),
-        },
-      });
-      this.$router.push({ name: 'products' });
-    } catch (error) {
-      console.error(error);
-    }
   },
   computed: {
     async isToken() {

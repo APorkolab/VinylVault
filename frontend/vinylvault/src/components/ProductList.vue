@@ -4,6 +4,9 @@
       <Login ref="auth" />
     </div>
     <div v-else class="container">
+      <router-link :to="{ name: 'newProduct', params: {} }">
+        <button class="btn btn-primary">New product</button>
+      </router-link>
       <table class="table table-striped table-dark">
         <thead>
           <tr>
@@ -22,10 +25,10 @@
             <td>{{ item.price }}</td>
             <td>
               <router-link :to="{ name: 'edit', params: { id: item.id } }">
-                Edit
+                <button class="btn btn-warning">Edit product</button>
               </router-link>
               <button class="btn btn-danger" @click="deleteProduct(item.id)">
-                Delete
+                Delete product
               </button>
             </td>
           </tr>

@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import ProductList from './components/ProductList.vue'
 import ProductEdit from './components/ProductEdit.vue'
+import NewProduct from './components/NewProduct.vue'
 import Register from './components/Register.vue'
 import Login from './components/Login.vue'
 import Auth from './components/Register.vue'
@@ -15,7 +15,7 @@ export default createRouter({
 	routes: [
 		{
 			path: '/',
-			component: HelloWorld,
+			component: ProductList,
 		},
 		{
 			path: '/products',
@@ -37,6 +37,11 @@ export default createRouter({
 			path: '/register',
 			name: 'Register',
 			component: Register
+		},
+		{
+			path: '/products/new',
+			name: 'newProduct',
+			component: NewProduct
 		}
 	]
 })
