@@ -67,14 +67,13 @@ export default {
         );
         // success
         if (response.status === 200) {
-          //modal
+          alert('Success Register!');
           console.log('Success Register!');
           this.$router.push('/login');
         }
       } catch (error) {
-        //modal
         console.error(error);
-        // handle error
+        alert('Error Register!');
       }
     },
   },

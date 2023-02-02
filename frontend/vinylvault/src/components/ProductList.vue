@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div v-if="!isToken">
-      <Login ref="auth" />
+    <div v-if="!isTokenLoaded || products.length === 0">
+      <router-link to="/login">
+        <button class="btn btn-primary">Login</button>
+      </router-link>
     </div>
 
     <div v-else class="container">
@@ -9,8 +11,6 @@
         <button class="btn btn-primary">New product</button>
       </router-link>
       <div>
-        <b-button v-b-modal.modal-1>Launch demo modal</b-button>
-
         <b-modal id="modal-1" title="BootstrapVue">
           <p class="my-4">Hello from modal!</p>
         </b-modal>
@@ -97,35 +97,42 @@ export default {
         console.error(error);
       }
     },
+
     async deleteProduct(id: number) {
       try {
-        let result = await axios.delete(
-          `http://localhost/vinylvault/products/${id}`,
-          {
-            headers: {
-              Authorization:
-                'Bearer ' + (await localForage.getItem('access_token')),
-              'HTTP-STATUS': '200',
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Headers':
-                'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
-            },
+        if (window.confirm('Are you sure you want to delete this product?')) {
+          let result = await axios.delete(
+            `http://localhost/vinylvault/products/${id}`,
+            {
+              headers: {
+                Authorization:
+                  'Bearer ' + (await localForage.getItem('access_token')),
+                'HTTP-STATUS': '200',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers':
+                  'Content-Type, Authorization, X-Requested-With, Origin, Accept, Access-Control-Request-Method, Access-Control-Request-Headers',
+              },
+            }
+          );
+          if (result.status === 400) {
+            const data = result.data;
+            await localForage.removeItem('access_token');
+            console.log('Please login!');
+            this.$router.push('/login');
+          } else {
+            console.log(result.data);
+            this.products = this.products.filter(
+              (product) => product.id !== id
+            );
+            alert('The product has been deleted successfully.');
           }
-        );
-        if (result.status === 400) {
-          const data = result.data;
-          await localForage.removeItem('access_token');
-          console.log('Please login!');
-          this.$router.push('/login');
-        } else {
-          console.log(result.data);
-          this.products = this.products.filter((product) => product.id !== id);
         }
       } catch (error) {
         console.error(error);
       }
     },
+
     async createProduct(product: Product) {
       try {
         let response = await axios.post(
@@ -155,10 +162,9 @@ export default {
         console.error(error);
       }
     },
-    async isToken() {
-      return (await localForage.getItem('access_token')) === null || undefined
-        ? false
-        : true;
+    async isTokenLoaded(): Promise<boolean> {
+      const token = await localForage.getItem('access_token');
+      return Boolean(token);
     },
   },
   components: { Login },

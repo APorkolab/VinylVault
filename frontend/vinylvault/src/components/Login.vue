@@ -63,12 +63,14 @@ export default {
             'access_token: ' + (await localForage.getItem('access_token'))
           );
           console.log('Invalid username or password');
+          alert('Invalid username or password');
         }
       } catch (error) {
         console.log(
           'access_token: ' + (await localForage.getItem('access_token'))
         );
         console.error(error);
+        alert('Invalid username or password');
       }
     },
   },

@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div await v-if="!isTokenLoaded">
-      <Login ref="auth" />
+    <div v-if="!isTokenLoaded">
+      <router-link to="/login">
+        <button class="btn btn-primary">Login</button>
+      </router-link>
     </div>
     <div v-else class="container">
       <form id="productForm">
@@ -36,31 +38,14 @@
           />
         </div>
         <div class="form-group">
-          <label for="is_available">Is available?</label>
-          <input
-            type="checkbox"
-            id="is_available"
-            v-model="product.is_avaible"
-          />
+          <label for="is_avaible">Is available?</label>
+          <input type="checkbox" id="is_avaible" v-model="product.is_avaible" />
         </div>
 
-        <button
-          class="btn btn-primary"
-          @click="
-            newProduct();
-            showModal();
-          "
-        >
-          Save
-        </button>
+        <button class="btn btn-primary" @click="newProduct()">Save</button>
         <a href="/products" class="btn btn-warning" role="button">Cancel</a>
       </form>
-      <!-- Bootstrap modal -->
-      <!-- Button trigger modal -->
       <div>
-        <b-button v-b-modal.modal-1>Launch demo modal</b-button>
-        <b-button @click="showModal()">eee demo modal</b-button>
-
         <b-modal id="modal-1" title="BootstrapVue">
           <p class="my-4">{{ modalMessage }}</p>
         </b-modal>
@@ -81,9 +66,7 @@ export default {
     return {
       product: new Product(),
       isTokenLoaded: false,
-      modalTitle: '',
       modalMessage: '',
-      modalShow: false,
     };
   },
   methods: {
@@ -105,39 +88,38 @@ export default {
               (await localForage.getItem('access_token').then((value) => {
                 return value;
               })),
+            'HTTP-STATUS': '200',
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
           },
         };
 
-        const response = await axios.post(
-          'http://localhost/vinylvault/products',
-          data,
-          config
-        );
-
-        if (response.status === 201) {
-          this.modalTitle = 'Success';
-          this.modalMessage = 'Product created successfully';
-          this.showModal();
-        } else {
-          this.modalTitle = 'Error';
-          this.modalMessage = 'Error creating product';
-          this.showModal();
-        }
+        const response = await axios
+          .post('http://localhost/vinylvault/products', data, config)
+          .then((response) => {
+            if (response.status !== 201) {
+              this.modalMessage = 'Error creating product';
+            } else {
+              this.modalMessage = 'Product created successfully';
+            }
+          })
+          .then(() => {
+            alert(this.modalMessage);
+          })
+          .catch((error) => {
+            console.error(error);
+            alert('Error creating product');
+          });
       } catch (error) {
-        this.modalTitle = 'Error';
-        this.modalMessage = 'Error creating product';
         console.error(error);
       }
-      // this.$router.push('/products');
-    },
-    async showModal() {
-      this.$root!.$emit('bv::show::modal', 'modal-1');
     },
   },
+
   computed: {
     async isTokenLoaded(): Promise<boolean> {
-      const token = await localForage.getItem(this.modalMessage);
+      const token = await localForage.getItem('access_token');
       return Boolean(token);
     },
   },

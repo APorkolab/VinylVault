@@ -1,9 +1,9 @@
-// --- // TODO: // - tesztelni a POST, PUT, metódusokat tesztelni a logoutot és
-megírni // ---
 <template>
   <div>
-    <div await v-if="!isToken">
-      <Login ref="auth" />
+    <div v-if="!isTokenLoaded">
+      <router-link to="/login">
+        <button class="btn btn-primary">Login</button>
+      </router-link>
     </div>
     <div v-else class="container">
       <form id="productForm">
@@ -45,9 +45,7 @@ megírni // ---
             v-model="product.is_avaible"
           />
         </div>
-        <button class="btn btn-primary" @click="saveProduct(product.id)">
-          Save
-        </button>
+        <button class="btn btn-primary" @click="saveProduct()">Save</button>
         <a href="/products" class="btn btn-warning" role="button">Cancel</a>
       </form>
     </div>
@@ -79,7 +77,7 @@ export default {
           {
             headers: {
               Authorization:
-                'Bearer ' +
+                'Bearer  ' +
                 (await localForage.getItem('access_token').then((value) => {
                   return value;
                 })),
@@ -91,50 +89,56 @@ export default {
             },
           }
         );
-        this.product = productResponse.data;
+
+        if (productResponse.status === 200) {
+          this.product = productResponse.data;
+        } else {
+          localForage.removeItem('access_token');
+          console.log('Please login!');
+          this.$router.push('/login');
+        }
       } catch (error) {
         console.error(error);
       }
     },
 
-    async saveProduct(productId: number) {
+    async saveProduct() {
       try {
-        let url = 'http://localhost/vinylvault/products/' + productId;
-        const productData = JSON.stringify(this.product);
-        const productResponse = await axios.put(url, productData, {
-          headers: {
-            Authorization:
-              'Bearer ' + (await localForage.getItem('access_token')),
-            'HTTP-STATUS': '200',
-            'Content-Type': 'application/json',
-          },
-        });
-        // if (productResponse.status === 200 || productResponse.status === 201) {
-        // }
+        const data = {
+          name: this.product.name,
+          description: this.product.description,
+          price: this.product.price,
+          is_avaible: this.product.is_avaible ? 1 : 0,
+        };
+
+        const productResponse = await axios.patch(
+          'http://localhost/vinylvault/products/' + this.$route.params.id,
+          JSON.stringify(data),
+          {
+            headers: {
+              Authorization:
+                'Bearer ' +
+                (await localForage.getItem('access_token').then((value) => {
+                  return value;
+                })),
+              'HTTP-STATUS': '200',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': '*',
+            },
+          }
+        );
+        // this.product = productResponse.data;
       } catch (error) {
         console.error(error);
       }
-      this.$router.push({ name: 'products' });
+      // this.$router.push({ name: 'products' });
     },
   },
-  async goToProductPage() {
-    try {
-      await axios.get('http://localhost/vinylvault/products/', {
-        headers: {
-          Authorization:
-            'Bearer ' + (await localForage.getItem('access_token')),
-        },
-      });
-      this.$router.push({ name: 'products' });
-    } catch (error) {
-      console.error(error);
-    }
-  },
   computed: {
-    async isToken() {
+    async isTokenLoaded(): Promise<boolean> {
       const token = await localForage.getItem('access_token');
-      const isToken = Boolean(token);
-      return isToken;
+      return Boolean(token);
     },
   },
 };
