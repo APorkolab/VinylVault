@@ -1,6 +1,7 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
 class ProductController
 {
     private ProductModel $model;
@@ -73,8 +74,8 @@ class ProductController
             $errors[] = "name is required";
         }
 
-        if (!empty($data["priority"]) && !is_int($data["priority"])) {
-            $errors[] = "priority must be an integer";
+        if (empty($data["price"]) || !is_numeric($data["price"])) {
+            $errors[] = "price is required and must be a number";
         }
 
         return $errors;
@@ -131,8 +132,8 @@ class ProductController
             $errors[] = "Price must be a number";
         }
 
-        if (!empty($data["is_available"]) && !in_array($data["is_available"], [0, 1])) {
-            $errors[] = "Is_available must be 0 or 1, because it's a boolean.";
+        if (!empty($data["is_avaible"]) && !in_array($data["is_avaible"], [0, 1])) {
+            $errors[] = "is_avaible must be 0 or 1, because it's a boolean.";
         }
 
         return $errors;

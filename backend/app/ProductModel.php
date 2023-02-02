@@ -87,7 +87,7 @@ VALUES (:name, :description, :price, :is_avaible, CURRENT_TIMESTAMP, :user_id)";
         }
 
         if (!empty($data["price"])) {
-            $fields["price"] = [$data["price"], PDO::PARAM_INT];
+            $fields["price"] = [(float) $data["price"], PDO::PARAM_STR];
         }
 
         if (!empty($data["is_avaible"])) {
