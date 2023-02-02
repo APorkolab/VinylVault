@@ -5,7 +5,7 @@
 ### Általános leírás
 
 Az alkalmazás célja egy bakelit kereső alkalmazás megvalósítása, amely lehetővé teszi a felhasználók számára, hogy létrehozzanak, szerkesszenek, töröljenek és keressenek termékeket. Az alkalmazás egy egyszerű login/regisztrációs mechanizmust is tartalmaz, amely lehetővé teszi a felhasználók számára, hogy hozzáférjenek az alkalmazáshoz.
-Illetve néhány minimális view-t is tartalmaz, mely megkönnyítik a felhasználók számára a regisztrációt és a bejelentkezést.
+Illetve néhány minimális view-t is tartalmaz a frontenden, mely megkönnyítik a felhasználók számára a regisztrációt és a bejelentkezést.
 
 ### A fejlesztési kritériumok:
 
@@ -47,7 +47,7 @@ http http://localhost/vinylvault/api/login.php username=alica password=secret
 
 ```
 
-1. A sikeres bejelentkezés után a program visszaküldi azt az időről-időre frissülő JWT tokent, melyet a kérésekhez mellékelni kell. Ennek a tokennek a helyességét a program ellenőrzi, és ha helytelen, akkor 401-es hibát küld vissza. A token érvényessége 5 perc, ezután újra be kell jelentkezni a 3. pont szerint. Token nélkül egyetlen kérést sem fogad el a program.
+1. A sikeres bejelentkezés után a program visszaküldi azt az időről-időre frissülő JWT tokent, melyet a kérésekhez mellékelni kell. Ennek a tokennek a helyességét a program ellenőrzi, és ha helytelen, akkor 401-es hibát küld vissza. A token érvényessége 1 óra, ezután újra be kell jelentkezni a 3. pont szerint. Token nélkül egyetlen kérést sem fogad el a program, kivéve a regisztrációt és a bejelentkezést.
 
 ## Endpoints
 
@@ -248,4 +248,69 @@ Törli az adatbázisból azt a terméket, aminek az ID-ja megegyezik a paraméte
 
 ## Frontend:
 
+A frontend egy Vue.js alkalmazás, amely a `vite` segítségével készült. A `vite` egy gyors és könnyen konfigurálható fejlesztői környezet, amely a modern webes fejlesztési technológiákat használja. A `vite` segítségével a frontend kódokat a böngészőben futtatjuk, így a fejlesztés gyors és hatékony. A `vite` a `vue` és a `vue-router` könyvtárakat is használja.
+
+A frontend alkalmazás a `src` könyvtárban található. A `src` könyvtárban található a `main.js` fájl, amely a Vue alkalmazás belépési pontja. A `main.js` fájlban a Vue alkalmazás konfigurációját és a Vue alkalmazás komponenseit definiáljuk.
+
+A Vue alkalmazás komponensei a `src/components` könyvtárban találhatóak. A `src/components` könyvtárban található a `App.vue` fájl, amely a Vue alkalmazás fő komponense. A `App.vue` fájlban a Vue alkalmazás komponenseit definiáljuk.
+
+A `src/router.js` fájlban a Vue alkalmazás útvonalait definiáljuk.
+
+A `src/store.js` fájlban a Vue alkalmazás állapotát definiáljuk.
+
+A frontend képes CRUD műveleteket végrehajtani a backend alkalmazás felé irányuló HTTP kérések segítségével.
+
 ### Használat:
+
+1. npm install
+2. npm run dev
+
+### A frontend alkalmazás komponensei:
+
+#### Login.vue
+
+A `Login.vue` komponens a felhasználó bejelentkezéséért felelős. A felhasználó bejelentkezéséhez meg kell adnia a felhasználónevét és a jelszavát. A felhasználó bejelentkezése után a felhasználó access_token nevű tokenjét a `localForage`-ban tároljuk. A `localForage`-ban tárolt felhasználó adatait a `src/store.js` fájlban kezeljük.
+
+#### Register.vue
+
+A `Register.vue` komponens a felhasználó regisztrációjáért felelős. A felhasználó regisztrációjához meg kell adnia a felhasználónevét, a jelszavát, és a jelszó megerősítését. A felhasználó regisztrációja után a felhasználó adatait a users SQL adatbázisban tároljuk.
+
+#### ProductEdit.vue
+
+A `ProductEdit.vue` komponens egy termék szerkesztéséért felelős. A termék szerkesztéséhez meg kell adnia a termék nevét, árát, és lehetőség szerint a leírását és az "elérhetőségét" (`is_available`). A termék szerkesztése után a termék adatait a products SQL adatbázisban tároljuk.
+
+#### ProductList.vue
+
+A `ProductList.vue` komponens a termékek listázásáért felelős. A termékek listázása után a termékek adatait a products SQL adatbázisban tároljuk.
+
+#### NewProduct.vue
+
+A `NewProduct.vue` komponens egy új termék létrehozásáért felelős. A termék létrehozásához meg kell adnia a termék nevét, árát, és lehetőség szerint a leírását és az "elérhetőségét" (`is_available`). A termék létrehozása után a termék adatait a products SQL adatbázisban tároljuk.
+
+### A frontend alkalmazás útvonalai:
+
+A frontend alkalmazás útvonalai a `src/router.js` fájlban találhatóak.
+
+#### /login
+
+A `/login` útvonal a `Login.vue` komponenshez tartozik. A `/login` útvonalon a felhasználó bejelentkezhet.
+
+#### /register
+
+A `/register` útvonal a `Register.vue` komponenshez tartozik. A `/register` útvonalon a felhasználó regisztrálhat.
+
+#### /products
+
+A `/products` útvonal a `ProductList.vue` komponenshez tartozik. A `/products` útvonalon a felhasználó termékeket listázhat.
+
+#### /products/new
+
+A `/products/new` útvonal a `NewProduct.vue` komponenshez tartozik. A `/products/new` útvonalon a felhasználó új terméket hozhat létre.
+
+#### /products/:id
+
+A `/products/:id/edit` útvonal a `ProductEdit.vue` komponenshez tartozik. A `/products/:id/edit` útvonalon a felhasználó egy terméket szerkeszthet.
+
+### A frontend alkalmazás végpontjai:
+
+Az alkalmazás végpontjaihoz Swagger dokumentáció készült. A Swagger dokumentáció elérhető a `/docs` útvonalon.
